@@ -27,17 +27,20 @@ def main() -> int:
     connection = build_database()
     print("SQL Advanced Analytics — synthetic e-commerce case study")
     print("\nMonthly revenue:")
-    print(connection.execute("SELECT * FROM monthly_revenue ORDER BY month").df().to_string(index=False))
+    for row in connection.execute("SELECT * FROM monthly_revenue ORDER BY month").fetchall():
+        print(row)
     print("\nTop 5 products:")
-    print(connection.execute(
+    for row in connection.execute(
         "SELECT product_name, category, units_sold, revenue FROM product_performance "
         "ORDER BY revenue DESC LIMIT 5"
-    ).df().to_string(index=False))
+    ).fetchall():
+        print(row)
     print("\nCustomer segments:")
-    print(connection.execute(
+    for row in connection.execute(
         "SELECT customer_segment, COUNT(*) AS customers FROM customer_rfm "
         "GROUP BY 1 ORDER BY 2 DESC"
-    ).df().to_string(index=False))
+    ).fetchall():
+        print(row)
     violations = run_quality_checks(connection)
     print(f"\nData-quality checks: {'PASS' if not violations else 'FAIL'}")
     if violations:
