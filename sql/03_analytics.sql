@@ -40,12 +40,11 @@ WITH product_sales AS (
         p.product_id,
         p.product_name,
         p.category,
-        SUM(oi.quantity) AS units_sold,
-        SUM(oi.quantity * oi.unit_price)::DECIMAL(14, 2) AS revenue
+        COALESCE(SUM(oi.quantity) FILTER (WHERE o.order_id IS NOT NULL), 0)::INTEGER AS units_sold,
+        COALESCE(SUM(oi.quantity * oi.unit_price) FILTER (WHERE o.order_id IS NOT NULL), 0)::DECIMAL(14, 2) AS revenue
     FROM products p
-    JOIN order_items oi USING (product_id)
-    JOIN orders o USING (order_id)
-    WHERE o.status = 'completed'
+    LEFT JOIN order_items oi USING (product_id)
+    LEFT JOIN orders o ON o.order_id = oi.order_id AND o.status = 'completed'
     GROUP BY p.product_id, p.product_name, p.category
 )
 SELECT
