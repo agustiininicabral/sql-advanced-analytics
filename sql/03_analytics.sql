@@ -58,7 +58,7 @@ WITH customer_metrics AS (
     SELECT
         c.customer_id,
         c.full_name,
-        MAX(o.order_date) AS last_order_date,
+        MAX(o.order_date) FILTER (WHERE o.status = 'completed') AS last_order_date,
         COUNT(DISTINCT o.order_id) FILTER (WHERE o.status = 'completed') AS frequency,
         COALESCE(SUM(oi.quantity * oi.unit_price) FILTER (WHERE o.status = 'completed'), 0)::DECIMAL(14, 2) AS monetary
     FROM customers c
